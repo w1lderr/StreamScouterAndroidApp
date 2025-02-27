@@ -1,1 +1,1 @@
-Stream Scouter, now available on your phone!
+# **Stream Scouter, now available on your phone!**
