@@ -1,9 +1,9 @@
 package com.example.streamscouter.ui.screen
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
@@ -30,12 +32,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import com.example.streamscouter.R
 import com.example.streamscouter.data.model.Movie
 
@@ -76,11 +81,13 @@ fun MainScreen(viewModel: MainViewModel) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             TextField(
+                modifier = Modifier.size(width = 280.dp, height = 60.dp),
                 value = movie_description,
                 onValueChange = { viewModel.onMovieDescriptionChanged(it) },
                 label = {
                     Text("Describe movie summary")
-                }
+                },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
             )
 
             Spacer(modifier = Modifier.width(5.dp))
@@ -88,7 +95,6 @@ fun MainScreen(viewModel: MainViewModel) {
             Button(
                 onClick = {
                     viewModel.getMovies()
-                    viewModel.setShowResult(true)
                 },
                 modifier = Modifier.size(height = 60.dp, width = 60.dp),
                 shape = RoundedCornerShape(10.dp),
@@ -138,20 +144,17 @@ fun MainScreen(viewModel: MainViewModel) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+            verticalArrangement = Arrangement.Center
         ) {
-            uiState.movies.let {
-                LazyColumn(
-                    content = {
-                        itemsIndexed(it) { _,item ->
-                            Log.d("ITEM", item.toString())
-                            MovieItem(
-                                item = item,
-                            )
-                        }
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier.fillMaxSize(),
+                content = {
+                    items(uiState.movies) {
+                        MovieItem(item = it)
                     }
-                )
-            }
+                }
+            )
         }
     }
 }
@@ -181,31 +184,57 @@ fun MovieItem(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(140.dp)
+            .size(width = 280.dp, height = 370.dp)
             .padding(20.dp)
             .clip(RoundedCornerShape(10.dp))
             .background(color = colorResource(R.color.streamscouter_gray)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        Row(
-            modifier = Modifier.fillMaxSize().padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
-            Text(
-                text = item.title,
-                fontSize = 20.sp,
-                color = colorResource(R.color.streamscouter_eee)
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .background(color = Color.Black)
+            ) {
+                AsyncImage(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(shape = RoundedCornerShape(10.dp)),
+                    model = item.poster_url,
+                    contentDescription = null,
+                )
+            }
 
-            Text(
-                text = item.match_percentage,
-                fontSize = 20.sp,
-                color = colorResource(R.color.streamscouter_eee)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(10.dp),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.Top
+            ) {
+                Text(
+                    text = item.title,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorResource(R.color.streamscouter_eee)
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(8.dp),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.Top
+            ) {
+                Text(
+                    text = "Match percentage: ${item.match_percentage}",
+                    fontSize = 13.sp,
+                    color = colorResource(R.color.streamscouter_eee)
+                )
+            }
         }
     }
 }
-

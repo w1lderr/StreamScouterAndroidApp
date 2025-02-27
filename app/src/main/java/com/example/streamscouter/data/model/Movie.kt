@@ -5,5 +5,6 @@ data class Movie(
     val description: String,
     val listed_in: String,
     val release_year: String,
-    val match_percentage: String
+    val match_percentage: String,
+    val poster_url: String
 )

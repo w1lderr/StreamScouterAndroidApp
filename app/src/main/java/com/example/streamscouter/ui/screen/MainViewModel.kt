@@ -17,12 +17,12 @@ class MainViewModel: ViewModel() {
     val uiState: Flow<MainUiState> get() = _uiState
     val movie_description: Flow<String> get() = _movie_description
 
-    fun setToast(toast: String) {
-        _uiState.value = _uiState.value.copy(toast = toast)
+    private fun setShowResult(value: Boolean) {
+        _uiState.value = _uiState.value.copy(showResult = value)
     }
 
-    fun setShowResult(value: Boolean) {
-        _uiState.value = _uiState.value.copy(showResult = value)
+    fun setToast(toast: String) {
+        _uiState.value = _uiState.value.copy(toast = toast)
     }
 
     fun onMovieDescriptionChanged(movie_description: String) {
@@ -37,6 +37,7 @@ class MainViewModel: ViewModel() {
                 if (current_movie_description.isNotEmpty()) {
                     val movies = _repository.value.getRecommendations(current_movie_description)
                     _uiState.value = _uiState.value.copy(movies = movies)
+                    setShowResult(true)
                 } else {
                     withContext(Dispatchers.Main) {
                         setToast("U forgot to describe ur movie :)")
