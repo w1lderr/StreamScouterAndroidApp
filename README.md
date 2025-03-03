@@ -39,5 +39,28 @@ To set up and run StreamScouter locally, follow these steps:
    ```bash
    jupyter notebook
    ```
+### To install app on your phone, download this [apk](https://github.com/w1lderr/StreamScouterAndroidApp/blob/master/app-debug.apk) file.
 
-### To install app on your phone download this [apk](https://github.com/w1lderr/StreamScouterAndroidApp/blob/master/app-debug.apk)
+## Usage
+1. Run the cells in the Jupyter Notebook.
+2. Enter a query (e.g., "After meeting at a party, a Cape Town teen tests a private-school swimmer's reputation") to get recommendations.
+3. View the ranked list of matching Netflix titles.
+
+## Technologies Used
+- **Python** 🐍
+- **Jupyter Notebook** 📓
+- **Sentence Transformers** 🤖
+- **Pandas & NumPy** 📊
+- **Kotlin** 🏝
+- **Coil** 🖼
+- **Retrofit** 🌐
+- **Okhttp** 🌐
+
+## Contributing
+We welcome contributions! Please open an issue or submit a pull request.
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contact
+🐙 GitHub: [@r4nol](https://github.com/r4nol) & [@w1lderrrr](https://github.com/w1lderr)
