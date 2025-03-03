@@ -9,4 +9,8 @@ class MainScreenRepo {
     suspend fun getRecommendations(film_description: String): List<Movie> {
         return streamScouterApi.getRecommendations(film_description)
     }
+
+    suspend fun getRandomRecommendations(): List<Movie> {
+        return streamScouterApi.getRandomRecommendations()
+    }
 }

@@ -1,6 +1,5 @@
 package com.example.streamscouter.ui.screen
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.streamscouter.data.repo.MainScreenRepo
@@ -17,7 +16,11 @@ class MainViewModel: ViewModel() {
     val uiState: Flow<MainUiState> get() = _uiState
     val movie_description: Flow<String> get() = _movie_description
 
-    private fun setShowResult(value: Boolean) {
+    init {
+        getRandomMovies()
+    }
+
+    private fun setShowResult(value: String) {
         _uiState.value = _uiState.value.copy(showResult = value)
     }
 
@@ -37,12 +40,25 @@ class MainViewModel: ViewModel() {
                 if (current_movie_description.isNotEmpty()) {
                     val movies = _repository.value.getRecommendations(current_movie_description)
                     _uiState.value = _uiState.value.copy(movies = movies)
-                    setShowResult(true)
+                    setShowResult("Result:")
                 } else {
                     withContext(Dispatchers.Main) {
                         setToast("U forgot to describe ur movie :)")
                     }
                 }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    setToast("Error: $e")
+                }
+            }
+        }
+    }
+
+    fun getRandomMovies() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val movies = _repository.value.getRandomRecommendations()
+                _uiState.value = _uiState.value.copy(movies = movies)
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     setToast("Error: $e")

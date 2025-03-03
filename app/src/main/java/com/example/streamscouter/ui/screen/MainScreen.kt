@@ -1,6 +1,11 @@
 package com.example.streamscouter.ui.screen
 
+import android.app.Activity
+import android.content.Intent
+import android.speech.RecognizerIntent
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,6 +34,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,13 +50,22 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.example.streamscouter.R
 import com.example.streamscouter.data.model.Movie
+import java.util.Locale
 
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState(MainUiState())
     val movie_description by viewModel.movie_description.collectAsState("")
-    val context = LocalContext.current
-
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == Activity.RESULT_OK) {
+            val data = it.data
+            val result = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+            viewModel.onMovieDescriptionChanged(result?.get(0) ?: "No speech detected.")
+        } else {
+            Toast.makeText(context, "Speech recognition failed.", Toast.LENGTH_SHORT).show()
+        }
+    }
     LaunchedEffect(uiState.toast) {
         if (uiState.toast.isNotEmpty()) {
             Toast.makeText(context, uiState.toast, Toast.LENGTH_SHORT).show()
@@ -110,7 +126,11 @@ fun MainScreen(viewModel: MainViewModel) {
 
             Button(
                 onClick = {
-
+                    val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                    intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Go on then, say something.")
+                    launcher.launch(intent)
                 },
                 modifier = Modifier.size(height = 60.dp, width = 60.dp),
                 shape = RoundedCornerShape(10.dp),
@@ -130,13 +150,11 @@ fun MainScreen(viewModel: MainViewModel) {
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (uiState.showResult) {
-                Text(
-                    text = "Result:",
-                    fontSize = 25.sp,
-                    fontWeight = FontWeight.Normal
-                )
-            }
+            Text(
+                text = uiState.showResult,
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Normal
+            )
         }
 
         Spacer(modifier = Modifier.height(30.dp))
